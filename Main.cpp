@@ -1,5 +1,4 @@
 ﻿#include <Windows.h>
-#include <iostream>
 
 enum
 {
@@ -32,8 +31,11 @@ int wmain()
 	HWND hWnds[COUNT] = { nullptr };
 	DWORD pids[COUNT] = { 0 };
 	RECT rcs[COUNT] = { 0 };
-	
 	int windowIndex;
+	HMONITOR hMonitor;
+	MONITORINFO mi = { 0 };
+	long workingAreaWidth;
+	long workingAreaHeight;
 
 	for (windowIndex = MAIN; windowIndex < COUNT; ++windowIndex)
 	{
@@ -53,41 +55,53 @@ int wmain()
 		return 2;
 	}
 
-	HMONITOR hMonitor = MonitorFromWindow(hWnds[MAIN], MONITOR_DEFAULTTONEAREST);
-	MONITORINFO mi;
+	hMonitor = MonitorFromWindow(hWnds[MAIN], MONITOR_DEFAULTTONEAREST);
 	mi.cbSize = sizeof(MONITORINFO);
 	if (GetMonitorInfoW(hMonitor, &mi) == 0) {
 		return 3;
 	}
 
-	long workingAreaWidth = mi.rcWork.right - mi.rcWork.left;
-	long workingAreaHeight = mi.rcWork.bottom - mi.rcWork.top;
+	workingAreaWidth = mi.rcWork.right - mi.rcWork.left;
+	workingAreaHeight = mi.rcWork.bottom - mi.rcWork.top;
 
-	rcs[SERIAL_MONITOR].left = mi.rcWork.left;
-	rcs[SERIAL_MONITOR].right = rcs[SERIAL_MONITOR].left + 300;
-	rcs[SERIAL_MONITOR].top = mi.rcWork.top;
-	rcs[SERIAL_MONITOR].bottom = workingAreaHeight;
+	if (hWnds[SERIAL_MONITOR] != nullptr && pids[MAIN] == pids[SERIAL_MONITOR])
+	{
+		rcs[SERIAL_MONITOR].left = mi.rcWork.left;
+		rcs[SERIAL_MONITOR].right = rcs[SERIAL_MONITOR].left + 300;
+		rcs[SERIAL_MONITOR].top = mi.rcWork.top;
+		rcs[SERIAL_MONITOR].bottom = workingAreaHeight;
+	}
 
-	rcs[REGISTERS].left = rcs[SERIAL_MONITOR].right;
-	rcs[REGISTERS].right = rcs[REGISTERS].left + 600;
-	rcs[REGISTERS].top = mi.rcWork.top;
-	rcs[REGISTERS].bottom = rcs[REGISTERS].top + 200;
+	if (hWnds[REGISTERS] != nullptr && pids[MAIN] == pids[REGISTERS])
+	{
+		rcs[REGISTERS].left = rcs[SERIAL_MONITOR].right;
+		rcs[REGISTERS].right = rcs[REGISTERS].left + 600;
+		rcs[REGISTERS].top = mi.rcWork.top;
+		rcs[REGISTERS].bottom = rcs[REGISTERS].top + 200;
+	}
 
-	rcs[MEMORY].left = rcs[SERIAL_MONITOR].right;
-	rcs[MEMORY].right = rcs[MEMORY].left + 600;
-	rcs[MEMORY].top = rcs[REGISTERS].bottom;
-	rcs[MEMORY].bottom = workingAreaHeight;
+	if (hWnds[MEMORY] != nullptr && pids[MAIN] == pids[MEMORY])
+	{
+		rcs[MEMORY].left = rcs[SERIAL_MONITOR].right;
+		rcs[MEMORY].right = rcs[MEMORY].left + 600;
+		rcs[MEMORY].top = rcs[REGISTERS].bottom;
+		rcs[MEMORY].bottom = workingAreaHeight;
+	}
 
-	GetWindowRect(hWnds[LAYERS], &rcs[LAYERS]);
-	rcs[LAYERS].left = rcs[SERIAL_MONITOR].right;
-	rcs[LAYERS].top = workingAreaHeight - (rcs[LAYERS].bottom - rcs[LAYERS].top);
-	rcs[LAYERS].right = 0;
-	rcs[LAYERS].bottom = 0;
+	if (hWnds[LAYERS] != nullptr && pids[MAIN] == pids[LAYERS])
+	{
+		GetWindowRect(hWnds[LAYERS], &rcs[LAYERS]);
+		rcs[LAYERS].left = rcs[SERIAL_MONITOR].right;
+		rcs[LAYERS].top = workingAreaHeight - (rcs[LAYERS].bottom - rcs[LAYERS].top);
+	}
 
-	rcs[MAIN].left = max(rcs[REGISTERS].right, rcs[MEMORY].right);
-	rcs[MAIN].right = workingAreaWidth;
-	rcs[MAIN].top = mi.rcWork.top;
-	rcs[MAIN].bottom = workingAreaHeight;
+	if (hWnds[MAIN] != nullptr)
+	{
+		rcs[MAIN].left = max(max(rcs[REGISTERS].right, rcs[MEMORY].right), rcs[LAYERS].right);
+		rcs[MAIN].right = workingAreaWidth;
+		rcs[MAIN].top = mi.rcWork.top;
+		rcs[MAIN].bottom = workingAreaHeight;
+	}
 
 	for (windowIndex = MAIN; windowIndex < COUNT; ++windowIndex)
 	{
