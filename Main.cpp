@@ -26,6 +26,11 @@ const UINT WINDOW_FLAGS[COUNT] = {
 	SWP_SHOWWINDOW | SWP_NOSIZE,
 };
 
+#define SERIAL_MONITOR_WIDTH (300)
+#define REGISTERS_WIDTH (600)
+#define REGISTERS_HEIGHT (200)
+#define MEMORY_WIDTH (600)
+
 int wmain()
 {
 	HWND hWnds[COUNT] = { nullptr };
@@ -68,7 +73,7 @@ int wmain()
 	if (hWnds[SERIAL_MONITOR] != nullptr && pids[MAIN] == pids[SERIAL_MONITOR])
 	{
 		rcs[SERIAL_MONITOR].left = mi.rcWork.left;
-		rcs[SERIAL_MONITOR].right = rcs[SERIAL_MONITOR].left + 300;
+		rcs[SERIAL_MONITOR].right = rcs[SERIAL_MONITOR].left + SERIAL_MONITOR_WIDTH;
 		rcs[SERIAL_MONITOR].top = mi.rcWork.top;
 		rcs[SERIAL_MONITOR].bottom = workingAreaHeight;
 	}
@@ -76,15 +81,15 @@ int wmain()
 	if (hWnds[REGISTERS] != nullptr && pids[MAIN] == pids[REGISTERS])
 	{
 		rcs[REGISTERS].left = rcs[SERIAL_MONITOR].right;
-		rcs[REGISTERS].right = rcs[REGISTERS].left + 600;
+		rcs[REGISTERS].right = rcs[REGISTERS].left + REGISTERS_WIDTH;
 		rcs[REGISTERS].top = mi.rcWork.top;
-		rcs[REGISTERS].bottom = rcs[REGISTERS].top + 200;
+		rcs[REGISTERS].bottom = rcs[REGISTERS].top + REGISTERS_HEIGHT;
 	}
 
 	if (hWnds[MEMORY] != nullptr && pids[MAIN] == pids[MEMORY])
 	{
 		rcs[MEMORY].left = rcs[SERIAL_MONITOR].right;
-		rcs[MEMORY].right = rcs[MEMORY].left + 600;
+		rcs[MEMORY].right = rcs[MEMORY].left + MEMORY_WIDTH;
 		rcs[MEMORY].top = rcs[REGISTERS].bottom;
 		rcs[MEMORY].bottom = workingAreaHeight;
 	}
