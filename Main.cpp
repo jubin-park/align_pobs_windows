@@ -57,7 +57,8 @@ int wmain()
 
 	hMonitor = MonitorFromWindow(hWnds[MAIN], MONITOR_DEFAULTTONEAREST);
 	mi.cbSize = sizeof(MONITORINFO);
-	if (GetMonitorInfoW(hMonitor, &mi) == 0) {
+	if (GetMonitorInfoW(hMonitor, &mi) == 0)
+	{
 		return 3;
 	}
 
